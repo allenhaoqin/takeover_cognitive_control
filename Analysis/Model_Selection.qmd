@@ -1,0 +1,30 @@
+---
+title: "Model_Selection"
+format: html
+editor: visual
+---
+
+## Description
+
+This script includes codes for backwards elimination and diagnostic plots.
+
+```{r}
+library(lme4)
+library(DHARMa)
+
+# Backwards elimination started from a full model
+GLMM <- lme4::lmer (rt ~ (automation+nback+runNumber)^2+(1+automation+nback|subNumber),data = df2,REML=FALSE)
+
+# Get and compare xxxxx,
+drop1(GLMM,test="Chisq")
+
+# Remove item that minimize AIC in sequence (always removing interaction effects first before removing subordinate main effects).
+GLMM <- update(GLMM, .~. -automation:runNumber)
+GLMM <- update(GLMM, .~. -nback:runNumber)
+GLMM <- update(GLMM, .~. -runNumber)
+
+# Q-Q plots and Residual Plots
+res = simulateResiduals(GLMM)
+plot(res)
+
+```
